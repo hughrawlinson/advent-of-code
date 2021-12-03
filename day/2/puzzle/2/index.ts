@@ -15,31 +15,35 @@ function instruction([direction, amount]: string[]): Instruction {
 let instructions = input.split('\n').map(v => instruction(v.split(' ')));
 
 interface Position {
+	aim: number;
 	horizontalPosition: number;
 	depth: number;
 }
 
-let finalPosition: Position = instructions.reduce<Position>(({ horizontalPosition, depth }, { direction, amount }) => {
+let finalPosition: Position = instructions.reduce<Position>(({ horizontalPosition, depth, aim }, { direction, amount }) => {
 	switch (direction) {
 		case "forward":
 			return {
 				horizontalPosition: horizontalPosition + amount,
-				depth
+				aim,
+				depth: depth + aim * amount,
 			}
 		case "down":
 			return {
 				horizontalPosition,
-				depth: depth + amount
+				depth,
+				aim: aim + amount
 			}
 		case "up":
 			return {
 				horizontalPosition,
-				depth: depth - amount
+				depth,
+				aim: aim - amount
 			}
 		default:
 			throw new Error(`Unknown instruction: ${instruction}`);
 	}
-}, { horizontalPosition: 0, depth: 0 });
+}, { horizontalPosition: 0, depth: 0, aim: 0 });
 
 console.log(finalPosition.depth * finalPosition.horizontalPosition);
 export { };
