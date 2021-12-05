@@ -54,28 +54,35 @@ const LineSegment = {
     const points: Point[] = [];
     const { start, end } = line;
     const length = LineSegment.length(line);
+    let [xoff, yoff] = [0, 0];
+    if (start.x > end.x) {
+      xoff = -1;
+    } else if (start.x < end.x) {
+      xoff = 1;
+    }
+    if (start.y > end.y) {
+      yoff = -1;
+    } else if (start.y < end.y) {
+      yoff = 1;
+    }
+
     for (let i = 0; i <= length; i++) {
-      if (LineSegment.isHorizontal(line)) {
-        points.push({
-          x: start.x - end.x > 0 ? start.x - i : start.x + i,
-          y: start.y,
-        });
-      } else {
-        points.push({
-          x: start.x,
-          y: start.y - end.y > 0 ? start.y - i : start.y + i,
-        });
-      }
+      points.push({
+        x: start.x + i * xoff,
+        y: start.y + i * yoff,
+      });
     }
     return points;
   },
   length(line: LineSegment): number {
     const { start, end } = line;
-    return Math.abs(start.x - end.x) + Math.abs(start.y - end.y);
+    return Math.max(Math.abs(start.x - end.x), Math.abs(start.y - end.y));
   },
 };
 
 type LineSegments = LineSegment[];
+
+let counter = 0;
 
 const LineSegments = {
   parse(input: string): LineSegments {
@@ -96,42 +103,32 @@ const LineSegments = {
     for (const line of lines) {
       const points = LineSegment.getPoints(line);
       for (const point of points) {
-        grid[point.y - minY][point.x - minX] = grid[point.y - minY][point.x - minX] ? grid[point.y - minY][point.x - minX] + 1 : 1;
+        counter++;
+        grid[point.y - minY][point.x - minX] = grid[point.y - minY][
+          point.x - minX
+        ]
+          ? grid[point.y - minY][point.x - minX] + 1
+          : 1;
       }
     }
     return grid;
   },
   getDebugString(lineSegments: LineSegments): string {
-    return LineSegments.plot(
-      lineSegments.filter(LineSegment.isHorizontalOrVertical)
-    )
+    return LineSegments.plot(lineSegments)
       .map((row) => row.map((x) => (x === 0 ? "." : x)).join(""))
       .join("\n");
   },
   display(lineSegments: LineSegments) {
-    // console.log(LineSegments.getDebugString(lineSegments));
-    const thing = LineSegments.plot(
-      lineSegments.filter(LineSegment.isHorizontalOrVertical)
-    ).flat().filter((x) => x > 1).length;
-    // .map((row) => row.map((x) => (x === 0 ? "." : x)).join(""))
-    // .join("\n");
-    console.log(thing);
+    console.log(LineSegments.getDebugString(lineSegments));
+  },
+  getNumberOfIntesectingPoints(lineSegments: LineSegments): number {
+    return LineSegments.plot(lineSegments)
+      .flat()
+      .filter((x) => x > 1).length;
   },
 };
 
-const lines = [
-  LineSegment.parse(`0,0 -> 10,0`),
-  LineSegment.parse(`0,0 -> 0,10`),
-  LineSegment.parse(`10,0 -> 10,10`),
-  LineSegment.parse(`0,10 -> 10,10`),
-];
-LineSegments.display(lines);
-
-const lineSegments = LineSegments.parse(input);
-
-const filteredLineSegments = lineSegments.filter(
-  LineSegment.isHorizontalOrVertical
-);
+const filteredLineSegments = LineSegments.parse(input);
 
 const totalLength = filteredLineSegments.reduce(
   (total, line) => total + LineSegment.length(line) + 1,
@@ -148,7 +145,6 @@ console.log({
   uniquePoints: uniqueSerializedPoints.length,
   difference: allPoints.length - uniqueSerializedPoints.length,
   differenceTotalLength: totalLength - uniqueSerializedPoints.length,
-  otherCount: LineSegments.display(filteredLineSegments),
+  numberOfIntersectingPoints:
+    LineSegments.getNumberOfIntesectingPoints(filteredLineSegments),
 });
-
-export {};
