@@ -1,7 +1,5 @@
 import v8 from "v8";
 
-// WIP: this doesn't produce the right answer for me.
-
 const input = ``;
 
 export interface Point {
