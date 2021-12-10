@@ -60,7 +60,6 @@ const Line = {
       }
     }
     if (stack.length > 0) {
-      // incomplete! ignore in part 1
       return {
         type: "Incomplete",
         line,
@@ -114,8 +113,6 @@ type ValidLine = {
 };
 
 type LineValidityResult = ValidLine | CorruptedLine | IncompleteLine;
-
-type LineValidityError = "Incomplete" | "Corrupted";
 
 type Input = string;
 
